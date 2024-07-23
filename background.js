@@ -35,15 +35,20 @@ const checkSelectedText = (selectionText) => {
 
             fullLog.log.data = fullLog.log.data.map((item) => {
                 try {
-                    let text = item.substring(item.indexOf('{')).trim();
-                    const lastBraceIndex = text.lastIndexOf('}');
+                    let text = item;
 
                     if (text.endsWith(';')) text = text.slice(0, -1).trim();
-                    if (lastBraceIndex !== -1) text = text.substring(0, lastBraceIndex + 1);
 
-                    const internalJson = JSON.parse(text.substring(text.indexOf('{')));
+                    const firstBraceIndex = text.indexOf('{');
+                    if (firstBraceIndex !== -1) text = text.substring(firstBraceIndex).trim();
 
-                    return internalJson;
+                    const lastBraceIndex = text.lastIndexOf('}');
+                    if (lastBraceIndex !== -1) text = text.substring(0, lastBraceIndex + 1).trim();
+
+                    return {
+                        loggerText: item.replace(/(\{.*\})/, '{...}'),
+                        data: JSON.parse(text),
+                    };
                 } catch {
                     return item;
                 }
